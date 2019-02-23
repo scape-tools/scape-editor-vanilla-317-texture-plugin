@@ -1,7 +1,7 @@
 package plugin
 
+import scape.editor.gui.plugin.IPlugin
 import scape.editor.gui.plugin.PluginDescriptor
-import scape.editor.gui.plugin.extension.IPlugin
 
 @PluginDescriptor(name = "317 Texture Plugin", authors = ["Nshusa"])
 class Plugin : IPlugin {

@@ -18,8 +18,6 @@ import scape.editor.fs.graphics.RSSprite
 import scape.editor.gui.App
 import scape.editor.gui.Settings
 import scape.editor.gui.controller.BaseController
-import scape.editor.gui.model.SpriteEncodingType
-import scape.editor.gui.model.SpriteModel
 import scape.editor.gui.util.toType
 import scape.editor.gui.util.write24Int
 import scape.editor.util.HashUtils
