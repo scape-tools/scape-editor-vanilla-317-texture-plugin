@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onMouseClicked" onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed" prefHeight="350.0" prefWidth="475.0" styleClass="cod-gray" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="plugin.TextureController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#onMouseClicked" onMouseDragged="#handleMouseDragged" onMousePressed="#handleMousePressed" prefHeight="350.0" prefWidth="475.0" styleClass="cod-gray" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="plugin.Controller">
    <center>
       <VBox alignment="CENTER">
          <children>

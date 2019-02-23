@@ -13,13 +13,13 @@ import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import org.imgscalr.Scalr
 import scape.editor.fs.RSArchive
+import scape.editor.fs.RSFileStore
 import scape.editor.fs.graphics.RSSprite
 import scape.editor.gui.App
 import scape.editor.gui.Settings
 import scape.editor.gui.controller.BaseController
 import scape.editor.gui.model.SpriteEncodingType
 import scape.editor.gui.model.SpriteModel
-import scape.editor.gui.plugin.extension.TextureExtension
 import scape.editor.gui.util.toType
 import scape.editor.gui.util.write24Int
 import scape.editor.util.HashUtils
@@ -32,7 +32,7 @@ import java.net.URL
 import java.util.*
 import javax.imageio.ImageIO
 
-class TextureController : BaseController() {
+class Controller : BaseController() {
 
     lateinit var listView: ListView<SpriteModel>
     lateinit var idT: Text
@@ -44,8 +44,8 @@ class TextureController : BaseController() {
     lateinit var encodingCb: ComboBox<SpriteEncodingType>
     lateinit var searchTf: TextField
 
-    val items = FXCollections.observableArrayList<SpriteModel>()
-    val encodingOptions = FXCollections.observableArrayList(SpriteEncodingType.HORIZONTAL, SpriteEncodingType.VERTICAL)
+    private val items = FXCollections.observableArrayList<SpriteModel>()
+    private val encodingOptions = FXCollections.observableArrayList(SpriteEncodingType.HORIZONTAL, SpriteEncodingType.VERTICAL)
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         encodingCb.items = encodingOptions
@@ -55,20 +55,21 @@ class TextureController : BaseController() {
             updateInfo(newValue.id, newValue.sprite)
         }
 
-        val filteredList = FilteredList(items) { _ -> true }
-        searchTf.textProperty().addListener { _, _, newValue -> filteredList.setPredicate { it ->
-            if (newValue == null || newValue.isEmpty()) {
-                return@setPredicate true
+        val filteredList = FilteredList(items) { true }
+        searchTf.textProperty().addListener { _, _, newValue ->
+            filteredList.setPredicate {
+                if (newValue == null || newValue.isEmpty()) {
+                    return@setPredicate true
+                }
+
+                val lowercase = newValue.toLowerCase()
+
+                if (it.toString().toLowerCase().contains(lowercase)) {
+                    return@setPredicate true
+                }
+
+                return@setPredicate false
             }
-
-            val lowercase = newValue.toLowerCase()
-
-            if (it.toString().toLowerCase().contains(lowercase)) {
-                return@setPredicate true
-            }
-
-            return@setPredicate false
-        }
         }
 
         val sortedList = SortedList(filteredList)
@@ -117,9 +118,7 @@ class TextureController : BaseController() {
     override fun onPopulate() {
         items.clear()
 
-        val extension = getExtension()
-
-        val archive = App.fs.getArchive(extension.getStoreId(), extension.getFileId()) ?: return
+        val archive = App.fs.getArchive(RSFileStore.ARCHIVE_FILE_STORE, RSArchive.TEXTURE_ARCHIVE) ?: return
 
         val indexHash = HashUtils.hashName("index.dat")
 
@@ -128,7 +127,7 @@ class TextureController : BaseController() {
         var count = 0
         var remaining = archive.entries.size - 1
 
-        while(remaining > 0) {
+        while (remaining > 0) {
             for (entry in archive.entries) {
                 if (entry.hash == indexHash) {
                     continue
@@ -216,7 +215,7 @@ class TextureController : BaseController() {
             return
         }
 
-        val task = object: Task<Boolean>() {
+        val task = object : Task<Boolean>() {
             override fun call(): Boolean {
 
                 val archive = RSArchive()
@@ -313,10 +312,9 @@ class TextureController : BaseController() {
                 }
 
                 val encoded = archive.encode()
-                val extension = getExtension()
 
-                val store = App.fs.getStore(extension.getStoreId())
-                store.writeFile(extension.getFileId(), encoded)
+                val store = App.fs.getStore(RSFileStore.ARCHIVE_FILE_STORE)
+                store.writeFile(RSArchive.TEXTURE_ARCHIVE, encoded)
 
                 val alert = Alert(Alert.AlertType.INFORMATION)
                 alert.title = "Info"
@@ -393,7 +391,7 @@ class TextureController : BaseController() {
             try {
                 var pos = 0
                 var found = true
-                while(found) {
+                while (found) {
                     found = false
                     for (item in items) {
                         if (item.id == pos) {
@@ -547,10 +545,6 @@ class TextureController : BaseController() {
         widthT.text = "0"
         heightT.text = "0"
         encodingCb.selectionModel.select(0)
-    }
-
-    fun getExtension() : TextureExtension {
-        return currentPlugin as TextureExtension
     }
 
 }
